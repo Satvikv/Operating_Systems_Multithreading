@@ -1,0 +1,47 @@
+
+What would be an elegant way to create and manage an arbitrary number of threads?
+
+ -> Initialize an array of some size. 
+ -> In a for loop, create each thread and assign a thread id for each thread by passing it to initial function to distinguish which thread is executing.
+ -> Assign the priority to the thread so that the scheduler knows which thread should be executed in what order. ( We have not implemented this in this assignment)
+ -> call the thread start method with inactive thread as main thread and current thread as 1st thread created and so on.
+
+
+Can you think of any uses for even the very simple form of threading we've developed in this assignment? What extra features could we add to make it more useful?
+ -> This threading functionality can be used to execute independent tasks of multiple threads. 
+ -> We can add locking if two or more threads share common memory or global variables. 
+ 
+Memory management can be a challenge in threading systems. 
+When is it safe to free a thread's stack? What about its thread control block? 
+How would this change if we wanted to return results from our threads, or implement a join procedure?
+
+-> Thread's stack and TCB can be freed after the initial function execution is completed and thread gets terminated.
+-> If we wanted perform join operation, we need to free memory after both threads complete their execution.
+
+
+
+
+
+
+Report: 
+
+We have created a data structure for a thread which contains a stack pointer, initial_function pointer, and argument pointer. 
+
+We defined a function that has same signature of initial function for assigning it to thread's initial function pointer for the thread to execute. 
+
+We declared two global thread variables for inactive/waiting thread and one for current running thread. For implementing context switching functionality using assembly language, 
+we pushed all the resigters of old thread and moved the stack pointer from the old thread to new thread and the new thread's registers popped from it's stack for execution. 
+When a thread beings to execute there will be nothing to pop from the stack, so we created another method which acts like switching but instead of popping we call wrap method which
+calls the initial function of the new thread so that new thread's stack will get filled with its local variables. The inactive thread will be the program's main thread and 
+the program's thread will be context switched. 
+
+In the program when we create a thread called "current_thread", we call start function for starting the created thread. In the method, 
+the inactive thread will be the main thread or the executing program's thread.
+
+After the thread finishes its execution, the main thread needs to get switched back to complete the program execution. For this we call yield function which calls
+thread_switch method which switches the created thread ("inactive thread") and main thread resumes its execution after the "thread start" function call.
+
+ 
+
+
+
