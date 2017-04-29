@@ -1,0 +1,83 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include"schedule.h"
+#define STACK_SIZE 1024*1024
+
+TCB* current_thread;
+struct queue ready_list;
+void thread_switch(TCB * old, TCB * new);
+void thread_start(TCB * old, TCB * new);
+
+void scheduler_begin(){
+ 
+ /*int *random_ptr=(int *)malloc(sizeof(int *));
+ *random_ptr=100;*/
+ current_thread=(TCB *)malloc(sizeof(TCB *));
+ current_thread->state=RUNNING;
+ ready_list.head=NULL;
+ ready_list.tail=NULL;
+ /*current_thread->initial_function=increment;//Initialize to a function of type void (void *)
+ current_thread->initial_argument=random_ptr;//Initialize to pointer 
+ current_thread->stack_pointer=(unsigned char *)malloc(STACK_SIZE)+STACK_SIZE;//Allocate memory for stack and move the pointer to end of the stack so that the stack will grow upwards.
+ */
+}
+
+void thread_fork(void (*target)(void*), void * arg){
+
+   TCB *new_thread;
+   new_thread=(TCB *)malloc(sizeof(TCB));
+   new_thread->stack_pointer=(unsigned char *)malloc(STACK_SIZE)+STACK_SIZE;
+   new_thread->initial_function=target;
+   new_thread->initial_argument=arg;
+   current_thread->state=READY;
+   new_thread->state=RUNNING;
+   enqueue(&ready_list,current_thread);
+   TCB * temp=current_thread;
+   current_thread=new_thread;
+   thread_start(temp,current_thread);
+}
+
+
+
+void thread_wrap(){
+  current_thread->initial_function(current_thread->initial_argument); 
+  yield(); 
+}
+/*int main(int argc, char **argv){
+  //int shared_var=10;
+  printf("Main thread started shared variable is %d\n",shared_var);
+  //TCB * threads[5];
+ //Allocate memory for the current thread
+
+ 
+ //current_thread->initial_function(current_thread->initial_argument);
+ //printf("%d",current_thread->stack_pointer);
+ inactive_thread=(TCB *) malloc(sizeof(TCB *));
+ thread_start(inactive_thread,current_thread);
+ printf("Main thread restarted shared var is %d\n",shared_var);  
+ 
+ //yield();
+ printf("Main thread ended and shared_var is %d\n",shared_var);
+ return 0;
+}*/
+
+void yield() {
+  
+	if(current_thread->state!=DONE){
+		current_thread->state=READY;
+	    TCB *ready_thread=dequeue(&ready_list);
+		ready_thread->state=RUNNING;
+		  TCB * temp = current_thread;
+          current_thread = ready_thread;
+		thread_switch(temp,current_thread);
+	}
+	
+    //thread_switch(current_thread, inactive_thread);
+}
+
+void scheduler_end(){
+  if(is_empty(&ready_list)){
+	  TCB *main_thread=(TCB *)malloc(sizeof(TCB));
+       thread_switch(current_thread,main_thread);
+  }
+}
