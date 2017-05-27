@@ -22,5 +22,4 @@ void yield();
 void scheduler_begin();
 void scheduler_end();
 
-int shared_var=10;
 
