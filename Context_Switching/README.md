@@ -1,9 +1,4 @@
-# Contributors: 
-# Satvik Vishnubhatta
-# Palak Goel
-# Nihal Jeena
 
-# Report
 
 We have created a data structure for a thread which contains a stack pointer, initial_function pointer, and argument pointer. 
 
